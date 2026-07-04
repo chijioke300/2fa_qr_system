@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan to Verify</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="card">
+        <h1>Scan to Verify</h1>
+        <p class="subtitle">Two-Factor Authentication &mdash; Step 2 of 2</p>
+
+        <p class="instruction">Scan this dynamic QR code with your phone to complete login.</p>
+
+        <div class="qr-wrap">
+            <img src="{{ url_for('qr_image', session_id=session_id) }}" alt="Dynamic QR code" id="qr">
+        </div>
+
+        <p class="timer">This code expires in <span id="countdown">{{ seconds_left }}</span> seconds.</p>
+
+        <div id="state" class="alert info">Waiting for scan&hellip;</div>
+
+        <a class="link" href="{{ url_for('login') }}">Cancel</a>
+    </div>
+
+    <script>
+        const sessionId = "{{ session_id }}";
+        let secondsLeft = {{ seconds_left }};
+
+        // Countdown timer for the dynamic token.
+        const countdownEl = document.getElementById("countdown");
+        const stateEl = document.getElementById("state");
+        const timer = setInterval(() => {
+            secondsLeft -= 1;
+            if (secondsLeft <= 0) {
+                secondsLeft = 0;
+                clearInterval(timer);
+            }
+            countdownEl.textContent = secondsLeft;
+        }, 1000);
+
+        // Poll the server to detect when the QR has been scanned.
+        const poll = setInterval(async () => {
+            try {
+                const res = await fetch(`/status/${sessionId}`);
+                const data = await res.json();
+
+                if (data.state === "verified") {
+                    clearInterval(poll);
+                    clearInterval(timer);
+                    stateEl.className = "alert success";
+                    stateEl.textContent = "Verified! Redirecting\u2026";
+                    setTimeout(() => window.location.href = "/dashboard", 800);
+                } else if (data.state === "expired") {
+                    clearInterval(poll);
+                    clearInterval(timer);
+                    stateEl.className = "alert error";
+                    stateEl.textContent = "QR code expired. Please log in again.";
+                } else if (data.state === "invalid") {
+                    clearInterval(poll);
+                    window.location.href = "/login";
+                }
+            } catch (e) {
+                // Ignore transient network errors and keep polling.
+            }
+        }, 1500);
+    </script>
+</body>
+</html>

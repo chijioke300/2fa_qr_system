@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="card center">
+        {% if ok %}
+        <div class="big-icon success-icon">&#10003;</div>
+        <h1>Verified</h1>
+        {% else %}
+        <div class="big-icon error-icon">&#10007;</div>
+        <h1>Not Verified</h1>
+        {% endif %}
+        <p class="instruction">{{ message }}</p>
+    </div>
+</body>
+</html>
