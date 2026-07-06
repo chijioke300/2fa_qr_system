@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.venv/Scripts/python.exe -c \"import flask, qrcode, cryptography; print\\('deps ok'\\)\")",
+      "Bash(.venv/Scripts/python.exe test_flow.py)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://127.0.0.1:5000/login)",
+      "mcp__claude-in-chrome__tabs_context_mcp",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://192.168.4.101:5000/login)",
+      "Bash(git --version)",
+      "Bash(gh --version)",
+      "Bash(gh auth *)",
+      "PowerShell(Get-NetConnectionProfile)"
+    ]
+  }
+}
