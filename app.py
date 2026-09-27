@@ -193,10 +193,13 @@ def dashboard():
     
     # Get logs and format timestamps
     logs = db.get_recent_logs()
+    formatted_logs = []
     for log in logs:
-        log['created_at'] = datetime.utcfromtimestamp(log['created_at']).strftime('%Y-%m-%d %H:%M:%S')
+        log_dict = dict(log)
+        log_dict['created_at'] = datetime.utcfromtimestamp(log_dict['created_at']).strftime('%Y-%m-%d %H:%M:%S')
+        formatted_logs.append(log_dict)
     
-    return render_template("dashboard.html", user=user, logs=logs)
+    return render_template("dashboard.html", user=user, logs=formatted_logs)
 
 
 @app.route("/logout")
