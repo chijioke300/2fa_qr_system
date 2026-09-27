@@ -24,6 +24,7 @@ import io
 import os
 import time
 import secrets
+from datetime import datetime
 
 import qrcode
 from flask import (
@@ -189,7 +190,13 @@ def dashboard():
     user = session.get("authenticated_user")
     if not user:
         return redirect(url_for("login"))
-    return render_template("dashboard.html", user=user, logs=db.get_recent_logs())
+    
+    # Get logs and format timestamps
+    logs = db.get_recent_logs()
+    for log in logs:
+        log['created_at'] = datetime.utcfromtimestamp(log['created_at']).strftime('%Y-%m-%d %H:%M:%S')
+    
+    return render_template("dashboard.html", user=user, logs=logs)
 
 
 @app.route("/logout")
